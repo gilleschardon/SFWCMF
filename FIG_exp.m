@@ -61,12 +61,12 @@ beam = real(sum(conj(dic) .* (DD * dic)));
 % SFW-CMF
 %[XSFWm, amps_SFWm] = sfw_cmf(Pmic, k, DD, XX, 0, 0, 1e-6, nbSources, [LBx LBy LBz]-0.01, [UBx UBy UBz]+0.01);
 
-% SWF-SPICE
-%[XSP1, amps_SP1] = sfw_spice(Pmic, k, DD, XX, 0, 0, nbSources, [LBx LBy LBz]-0.01, [UBx UBy UBz]+0.01);
+% SWF-COMET1
+%[XSP1, amps_SP1] = sfw_comet1(Pmic, k, DD, XX, 0, 0, nbSources, [LBx LBy LBz]-0.01, [UBx UBy UBz]+0.01);
 
-% SWF-SPICE2
+% SWF-COMET2
 tic
-[XSP2, amps_SP2, sn] = sfw_spice2(Pmic, k, DD, XX, 0, 0, nbSources, [LBx LBy LBz]-0.01, [UBx UBy UBz]+0.01);
+[XSP2, amps_SP2, sn] = sfw_comet2(Pmic, k, DD, XX, 0, 0, nbSources, [LBx LBy LBz]-0.01, [UBx UBy UBz]+0.01);
 TSP2 = toc;
 
 % MUSIC
@@ -139,7 +139,7 @@ xlim([-2, 1])
 ylim([-1, 0])
 colorbar
 
-% SPICE2 and MUSIC
+% COMET2 and MUSIC
 figure
 
 % XY
@@ -149,7 +149,7 @@ hold on
 scatter(XSP2(:, 1),XSP2(:, 2), amps_SP2/1e3+eps, C(3, :), '+', 'linewidth', 3)
 scatter(XM(:, 1),XM(:, 2),Pmest/1e3+eps, C(4, :), 'x', 'linewidth', 3)
 axis image
-legend('Sources', 'SPICE2', 'MUSIC')
+legend('Sources', 'COMET2', 'MUSIC')
 xlabel('X')
 ylabel('Y')
 xlim([-2, 1])
@@ -220,13 +220,13 @@ DD = datan*datan' / size(data, 2);
 % % SFW-CMF
 %  [XSFWm, amps_SFWm] = sfw_cmf(Pmic, k, DD, XX, 0, 0, 1e-6, nbSources, [LBx LBy LBz]-0.01, [UBx UBy UBz]+0.01);
 %
-%  % SWF-SPICE
+%  % SWF-COMET1
 %
-%  [XSP1, amps_SP1] = sfw_spice(Pmic, k, DD, XX, 0, 0, nbSources, [LBx LBy LBz]-0.01, [UBx UBy UBz]+0.01);
+%  [XSP1, amps_SP1] = sfw_comet1(Pmic, k, DD, XX, 0, 0, nbSources, [LBx LBy LBz]-0.01, [UBx UBy UBz]+0.01);
 
 
-% SWF-SPICE2
-[XSP2, amps_SP2] = sfw_spice2(Pmic, k, DD, XX, 0, 0, nbSources, [LBx LBy LBz]-0.01, [UBx UBy UBz]+0.01);
+% SWF-COMET2
+[XSP2, amps_SP2] = sfw_comet2(Pmic, k, DD, XX, 0, 0, nbSources, [LBx LBy LBz]-0.01, [UBx UBy UBz]+0.01);
 
 % MUSIC
 [XM, Pmest] = MUSIC_local_exp(DD, nbSources,XX,Pmic, k);
@@ -283,7 +283,7 @@ scatter(Xgt(:, 1), Xgt(:, 2), 100, 'o', 'filled', 'MarkerFaceColor', [0.8 0.8 0.
 hold on
 scatter(XSP2(:, 1),XSP2(:, 2), amps_SP2/1e3+eps,C(3, :), '+', 'linewidth', 3)
 scatter(XM(:, 1),XM(:, 2),Pmest/1e3+eps, C(4, :),'x', 'linewidth', 3)
-legend('Sources', 'SPICE2', 'MUSIC')
+legend('Sources', 'COMET2', 'MUSIC')
 xlabel('X')
 ylabel('Y')
 axis image

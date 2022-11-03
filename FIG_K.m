@@ -98,17 +98,17 @@ for ii = 1:nbPlots
         SOURCES_AMPS_EST{ii, s, 1} = amps_SFWm;
         
         
-        % SWF-SPICE
+        % SWF-COMET1
         
-        [XSP1, amps_SP1, ~, ~, amps_SP1_pinv] = sfw_spice(Pmic, k, DD, XX, 0, 0, nbSources, [LBx LBy LBz]-0.01, [UBx UBy UBz]+0.01);
+        [XSP1, amps_SP1, ~, ~, amps_SP1_pinv] = sfw_comet1(Pmic, k, DD, XX, 0, 0, nbSources, [LBx LBy LBz]-0.01, [UBx UBy UBz]+0.01);
         SOURCES_POS_EST{ii, s, 2} = XSP1;
         SOURCES_AMPS_EST{ii, s, 2} = amps_SP1;
         % least-squares reestimation
         SOURCES_AMPS_EST{ii, s, 8} = amps_SP1_pinv;
         
-        % SWF-SPICE2
+        % SWF-COMET2
         
-        [XSP2, amps_SP2, ~, ~, amps_SP2_pinv] = sfw_spice2(Pmic, k, DD, XX, 0, 0, nbSources, [LBx LBy LBz]-0.01, [UBx UBy UBz]+0.01);
+        [XSP2, amps_SP2, ~, ~, amps_SP2_pinv] = sfw_comet2(Pmic, k, DD, XX, 0, 0, nbSources, [LBx LBy LBz]-0.01, [UBx UBy UBz]+0.01);
         SOURCES_POS_EST{ii, s, 3} = XSP2;
         SOURCES_AMPS_EST{ii, s, 3} = amps_SP2;
         
@@ -164,7 +164,7 @@ for ii = 1:nbPlots
             
         end
         
-        % power errors for the reestimated SPICE
+        % power errors for the reestimated COMET
         m = 8;
         [epos, eamps] = compute_errors(SOURCES_POS_EST{ii, s, 2}, SOURCES_POS{ii, s}, SOURCES_AMPS_EST{ii, s, m}, SOURCES_AMPS{ii, s});
         EAMPS(ii, m, s) = eamps;
@@ -202,7 +202,7 @@ plot(abss, mEPOS(:, 6), '-.', 'linewidth', LW, 'markersize', MS)
 plot(abss, mEPOS(:, 7), '-', 'linewidth', LW, 'markersize', MS)
 
 
-legend('CMF-N', 'SPICE1', 'SPICE2', 'MUSIC', 'OBF', 'OMP', 'CSC')
+legend('CMF-N', 'COMET1', 'COMET2', 'MUSIC', 'OBF', 'OMP', 'CSC')
 
 xlabel('k')
 ylabel('Position MSE')
@@ -219,5 +219,5 @@ semilogy(abss, mEAMPS(:, 4).*(ratiom >= ratiomin), '--s', 'linewidth', LW, 'mark
 plot(abss, mEAMPS(:, 9), '--o', 'linewidth', LW, 'markersize', MS)
 xlabel('k')
 ylabel('Power MSE')
-legend('CMF-N', 'SPICE1', 'SPICE2', 'MUSIC', 'SP2LS')
+legend('CMF-N', 'COMET1', 'COMET2', 'MUSIC', 'COMET2LS')
 

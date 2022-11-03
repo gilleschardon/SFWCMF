@@ -5,7 +5,7 @@ Code and data to reproduce the results of XXXX
 
 ## Figures
 
-The proposed methods (CMF and SPICE with Sliding Frank-Wolfe) are compared with MUSIC, CLEAN-SC, OMP, and differential evolution (see references in the paper)
+The proposed methods (CMF and COMET with Sliding Frank-Wolfe) are compared with MUSIC, CLEAN-SC, OMP, and differential evolution (see references in the paper)
 
 * `FIG_exp.m`: experimental results (noiseless and noisy versions)
 * `FIG_SNR.m`: performance in function of the signal to noise ratio
@@ -20,4 +20,4 @@ Most of the scripts are for internal use or for comparison purposes.
 The main scripts are:
 
 * `sfw_cmf.m`: SFW algorithm for the CMF problem
-* `sfw_spice.m` and `sfw_spice2.m` : SFW algorithm for the two SPICE variants
+* `sfw_comet1.m` and `sfw_comet2.m` : SFW algorithm for the two COMET variants

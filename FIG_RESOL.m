@@ -8,7 +8,7 @@ close all
 nbSources=2;
 
 % tested coordinate
-coord = 'Z';
+coord = 'X';
 
 if coord == 'Z'
     % frequency
@@ -131,17 +131,17 @@ for ii = 1:nbPlots
         %
         %         SS{1} = [SS{1} ; XSFWm(:, idxc) delta*ones(size(XSFWm, 1), 1) amps_SFWm];
         
-        %         % SWF-SPICE
+        %         % SWF-COMET1
         %
-        %         [XSP1, amps_SP1] = sfw_spice(Pmic, k, DD, XX, 0, 0, nbSources, [LBx LBy LBz]-0.01, [UBx UBy UBz]+0.01);
+        %         [XSP1, amps_SP1] = sfw_comet1(Pmic, k, DD, XX, 0, 0, nbSources, [LBx LBy LBz]-0.01, [UBx UBy UBz]+0.01);
         %          SOURCES_POS_EST{ii, s, 2} = XSP1;
         %          SOURCES_AMPS_EST{ii, s, 2} = amps_SP1;
         %
         %         SS{2} = [SS{2} ; XSP1(:, idxc) delta*ones(size(XSP1, 1), 1) amps_SP1];
         
-        % SWF-SPICE2
+        % SWF-COMET2
         
-        [XSP2, amps_SP2] = sfw_spice2(Pmic, k, DD, XX, 0, 0, nbSources, [LBx LBy LBz]-0.01, [UBx UBy UBz]+0.01);
+        [XSP2, amps_SP2] = sfw_comet2(Pmic, k, DD, XX, 0, 0, nbSources, [LBx LBy LBz]-0.01, [UBx UBy UBz]+0.01);
         SOURCES_POS_EST{ii, s, 3} = XSP2;
         SOURCES_AMPS_EST{ii, s, 3} = amps_SP2;
         
@@ -200,7 +200,7 @@ scatter(SS{5}(:, 2)*2, SS{5}(:, 1), SS{5}(:, 3)*50+eps, C(5, :), '^')
 scatter(SS{7}(:, 2)*2, SS{7}(:, 1), max(SS{7}(:, 3),0)*100+eps, C(7, :), '+')
 
 
-legend('SP2', 'MUSIC', 'OBF', 'CLEAN-SC')
+legend('COMET2', 'MUSIC', 'OBF', 'CLEAN-SC')
 
 xlabel('\delta')
 if coord == 'X'

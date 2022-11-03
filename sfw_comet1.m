@@ -1,6 +1,6 @@
-function [Xs, amps, v, nu, Pest] = sfw_spice(Xm, k, Data, Xgrid, tolpos, tolamp, Niter, LX, UX)
+function [Xs, amps, v, nu, Pest] = sfw_comet1(Xm, k, Data, Xgrid, tolpos, tolamp, Niter, LX, UX)
 
-%% SFW for SPICE
+%% SFW for COMET1
 
 % Xm microphone positions Mx3
 % k wavenumber
