@@ -33,7 +33,7 @@ for u = 1:Niter
     P = [P p];
 
     % SC stuff (!!??)
-    h = w;
+    h = d;
     Sigmadr = Sigma - diag(diag(Sigma));
     for v = 1:100
         HH = diag(diag(h*h'));

@@ -13,7 +13,7 @@ snr = -10;
 SNAPS = [1 2 5 10 20 50 100 200 500 1000 2000 5000];
 
 k = 80;
-nbMethods = 7;
+nbMethods = 8;
 
 nbPlots = length(SNAPS);
 
@@ -103,14 +103,14 @@ for s = 1:sample_size
         SOURCES_POS_EST{ii, s, 2} = XSP1;
         SOURCES_AMPS_EST{ii, s, 2} = amps_SP1;
         % least-squares reestimation
-        SOURCES_AMPS_EST{ii, s, 8} = amps_SP1_pinv;
+        SOURCES_AMPS_EST{ii, s, 9} = amps_SP1_pinv;
         
         % SWF-COMET2       
         [XSP2, amps_SP2, ~, ~, amps_SP2_pinv] = sfw_comet2(Pmic, k, DD, XX, 0, 0, nbSources, [LBx LBy LBz]-0.01, [UBx UBy UBz]+0.01);
         SOURCES_POS_EST{ii, s, 3} = XSP2;
         SOURCES_AMPS_EST{ii, s, 3} = amps_SP2;
         
-        SOURCES_AMPS_EST{ii, s, 9} = amps_SP2_pinv;
+        SOURCES_AMPS_EST{ii, s, 10} = amps_SP2_pinv;
         
         % MUSIC
         [XM, Pmest] = MUSIC_local(DD, nbSources,XX,Pmic, k);
@@ -131,6 +131,12 @@ for s = 1:sample_size
         [Xcsc, Pcsc, H] = clean_sc_dr(DD,nbSources,XX, Pmic, k, 1);
         SOURCES_POS_EST{ii, s, 7} = Xcsc;
         SOURCES_AMPS_EST{ii, s, 7} = Pcsc;
+        
+                
+        % HR-CLEAN-SC
+        [Xcsc, Pcsc, H] = hr_clean_sc_dr(DD,nbSources,XX, Pmic, k, 1, 0.25);
+        SOURCES_POS_EST{ii, s, 8} = Xcsc;
+        SOURCES_AMPS_EST{ii, s, 8} = Pcsc;
     end
 end
 
@@ -140,84 +146,8 @@ save data_fig_SNAPS
 
 load data_fig_SNAPS
 
-
-
-% errors
-EPOS = zeros(nbPlots, nbMethods, sample_size);
-EAMPS = zeros(nbPlots, nbMethods+2, sample_size);
-
-% true is MUSIC has found all the sources
-music_has_found_all = zeros(nbPlots, sample_size);
-
-for ii = 1:nbPlots
-
-    for s = 1:sample_size
-        for m = 1:nbMethods
-
-            [epos, eamps] = compute_errors(SOURCES_POS_EST{ii, s, m}, SOURCES_POS{ii, s}, SOURCES_AMPS_EST{ii, s, m}, SOURCES_AMPS{ii, s});
-            EPOS(ii, m, s) = epos;
-            EAMPS(ii, m, s) = eamps;
-            
-            if m == 4                
-                music_has_found_all(ii, s) = (size(SOURCES_POS_EST{ii, s, m}, 1)  == nbSources);
-            end
-            
-            
-        end
-        
-        % power errors for the reestimated COMET
-        m = 8;
-        [epos, eamps] = compute_errors(SOURCES_POS_EST{ii, s, 2}, SOURCES_POS{ii, s}, SOURCES_AMPS_EST{ii, s, m}, SOURCES_AMPS{ii, s});
-        EAMPS(ii, m, s) = eamps;
-        m = 9;
-        [epos, eamps] = compute_errors(SOURCES_POS_EST{ii, s, 3}, SOURCES_POS{ii, s}, SOURCES_AMPS_EST{ii, s, m}, SOURCES_AMPS{ii, s});
-        EAMPS(ii, m, s) = eamps;
-    end
-end
-figure
-
-% x-axis
 abss = SNAPS;
+xtitle = 'Number of snapshots';
 
-% minimal ratio of identified sources for MUSIC
-ratiom = sum(music_has_found_all, 2)/sample_size;
-ratiomin = 0.9;
-
-% linewidth
-LW = 2;
-% marker size
-MS = 15;
-
-% MSE
-mEPOS = mean(EPOS, 3);
-mEAMPS = mean(EAMPS, 3);
-
-
-subplot(2, 1, 1)
-loglog(abss,  mEPOS(:, 1), '-+', 'linewidth', LW, 'markersize', MS)
-hold on
-plot(abss, mEPOS(:, 2).* (SNAPS >= size(Pmic, 1))', '-x', 'linewidth', LW, 'markersize', MS)
-plot(abss, mEPOS(:, 3), '-o', 'linewidth', LW, 'markersize', MS)
-plot(abss, mEPOS(:, 4).*(ratiom >= ratiomin), '--s', 'linewidth', LW, 'markersize', MS)
-
-plot(abss, mEPOS(:, 5), '--', 'linewidth', LW, 'markersize', MS)
-plot(abss, mEPOS(:, 6), '-.', 'linewidth', LW, 'markersize', MS)
-plot(abss, mEPOS(:, 7), '-', 'linewidth', LW, 'markersize', MS)
-legend('CMF-N', 'COMET1', 'COMET2', 'MUSIC', 'OBF', 'OMP', 'CSC')
-
-xlabel('snaps')
-ylabel('Position MSE')
-
-subplot(2, 1, 2)
-loglog(abss, mEAMPS(:, 1), '-+', 'linewidth', LW, 'markersize', MS)
-hold on
-semilogy(abss, mEAMPS(:, 2).* (SNAPS >= size(Pmic, 1))', '-x', 'linewidth', LW, 'markersize', MS)
-semilogy(abss, mEAMPS(:, 3), '-o', 'linewidth', LW, 'markersize', MS)
-semilogy(abss, mEAMPS(:, 4).*(ratiom >= ratiomin), '--s', 'linewidth', LW, 'markersize', MS)
-plot(abss, mEAMPS(:, 9), '--o', 'linewidth', LW, 'markersize', MS)
-
-
-xlabel('snaps')
-ylabel('Power MSE')
-legend('CMF-N', 'COMET1', 'COMET2', 'MUSIC', 'COMET2LS')
+plot_perf(SOURCES_POS, SOURCES_AMPS, SOURCES_POS_EST, SOURCES_AMPS_EST, nbSources, abss, xtitle)
 

@@ -11,7 +11,7 @@ close all
 %% Parameters of the simulation
 
 % do we test differential evolution (long)
-DE = false;
+DE = true;
 
 % frequency
 f = 340 * k /2/pi;
@@ -83,6 +83,10 @@ tic
 [Xcsc, q_CSC] = clean_sc_dr(DD,nbSources,XX, Pmic, k, 1);
 TCSC = toc;
 
+tic
+[Xhrcsc, q_HRCSC] = hr_clean_sc(DD,nbSources,XX, Pmic, k, 1, 0.25);
+THRCSC = toc;
+
 % differential evolution
 if DE
     
@@ -126,81 +130,109 @@ load Xgt
 C = colororder();
 
 % beamforming
-figure
 imagesc(xxb, yyb, 10*log10(reshape(beam, 101, 301)))
 axis xy
 axis image
 colormap(hot)
 hold on
 scatter(Xgt(:, 1), Xgt(:, 2), 100, 'o', 'filled', 'MarkerFaceColor', [0.8 0.8 0.8])
-xlabel('X')
-ylabel('Y')
+xlabel('X (m)')
+ylabel('Y (m)')
 xlim([-2, 1])
 ylim([-1, 0])
-colorbar
+cb = colorbar;
+ylabel(cb,'Power (dB)')%,'FontSize',16,'Rotation',270);
 
 % COMET2 and MUSIC
-figure
+
+figure('Position', [100, 100, 1200, 500])
 
 % XY
-subplot(2, 2, 1)
+subplot(2, 3, 1)
 scatter(Xgt(:, 1), Xgt(:, 2), 200, 'o', 'filled', 'MarkerFaceColor', [0.8 0.8 0.8])
 hold on
 scatter(XSP2(:, 1),XSP2(:, 2), amps_SP2/1e3+eps, C(3, :), '+', 'linewidth', 3)
-scatter(XM(:, 1),XM(:, 2),Pmest/1e3+eps, C(4, :), 'x', 'linewidth', 3)
+scatter(XM(:, 1),XM(:, 2),Pmest/1e3+eps, C(7, :), 'x', 'linewidth', 3)
 axis image
 legend('Sources', 'COMET2', 'MUSIC')
-xlabel('X')
-ylabel('Y')
+xlabel('X (m)')
+ylabel('Y (m)')
 xlim([-2, 1])
 ylim([-1, 0])
 
 % XZ
-subplot(2, 2, 3)
+subplot(2, 3, 4)
 scatter(Xgt(:, 1), Xgt(:, 3), 200, 'o', 'filled', 'MarkerFaceColor', [0.8 0.8 0.8])
 hold on
 scatter(XSP2(:, 1),XSP2(:, 3), amps_SP2/1e3+eps, C(3, :), '+', 'linewidth', 3)
-scatter(XM(:, 1), XM(:, 3),Pmest/1e3+eps, C(4, :), 'x', 'linewidth', 3)
+scatter(XM(:, 1), XM(:, 3),Pmest/1e3+eps, C(7, :), 'x', 'linewidth', 3)
 axis image
-xlabel('X')
-ylabel('Z')
+xlabel('X (m)')
+ylabel('Z (m)')
 xlim([-2, 1])
 ylim([4, 5])
 
 % CLEAN-SC and differential evolution
 
 % XY
-subplot(2, 2, 2)
+subplot(2, 3, 2)
 scatter(Xgt(:, 1), Xgt(:, 2), 200, 'o', 'filled', 'MarkerFaceColor', [0.8 0.8 0.8])
 hold on
-scatter(Xcsc(:, 1),Xcsc(:, 2),q_CSC/1e3+eps, C(7, :), '+', 'linewidth', 3)
-if DE
-    scatter(depos(1, :),depos(2, :),depow/1e3+eps, C(1, :), 'x', 'linewidth', 3)
-    legend('Sources','CLEAN-SC', 'DE')
-else
-    legend('Sources','CLEAN-SC') 
-end
+scatter(Xcsc(:, 1),Xcsc(:, 2),q_CSC/1e3+eps, C(2, :), '+', 'linewidth', 3)
+scatter(Xhrcsc(:, 1),Xhrcsc(:, 2),q_HRCSC/1e3+eps, C(6, :), 'x', 'linewidth', 3)
+    legend('Sources','CLEAN-SC', 'HR-CLEAN-SC') 
 axis image
 
-xlabel('X')
-ylabel('Y')
+xlabel('X (m)')
+ylabel('Y (m)')
 xlim([-2, 1])
 ylim([-1, 0])
 
 % YZ
-subplot(2, 2, 4)
+
+
+ if DE
+subplot(2, 3, 5)
 scatter(Xgt(:, 1), Xgt(:, 3), 200, 'o', 'filled', 'MarkerFaceColor', [0.8 0.8 0.8])
+
 hold on
-scatter(Xcsc(:, 1),Xcsc(:, 3),q_CSC/1e3+eps, C(7, :), '+', 'linewidth', 3)
-if DE
-    scatter(depos(1, :),depos(3, :),depow/1e3+eps, C(1, :), 'x', 'linewidth', 3)
-end
+scatter(Xcsc(:, 1),Xcsc(:, 3),q_CSC/1e3+eps, C(2, :), '+', 'linewidth', 3)
+scatter(Xhrcsc(:, 1),Xhrcsc(:, 3),q_HRCSC/1e3+eps, C(6, :), 'x', 'linewidth', 3)
 axis image
-xlabel('X')
-ylabel('Z')
+
+xlabel('X (m)')
+ylabel('Y (m)')
 xlim([-2, 1])
 ylim([4, 5])
+% XY
+subplot(2, 3, 3)
+scatter(Xgt(:, 1), Xgt(:, 2), 200, 'o', 'filled', 'MarkerFaceColor', [0.8 0.8 0.8])
+hold on
 
+    scatter(depos(1, :),depos(2, :),depow/1e3+eps, C(5, :), 's', 'linewidth', 3)
+    legend('Sources', 'DE')
+
+axis image
+
+xlabel('X (m)')
+ylabel('Y (m)')
+xlim([-2, 1])
+ylim([-1, 0])
+
+% YZ
+subplot(2, 3, 6)
+scatter(Xgt(:, 1), Xgt(:, 3), 200, 'o', 'filled', 'MarkerFaceColor', [0.8 0.8 0.8])
+
+hold on
+
+    scatter(depos(1, :),depos(3, :),depow/1e3+eps, C(5, :), 's', 'linewidth', 3)
+
+axis image
+xlabel('X (m)')
+ylabel('Z (m)')
+xlim([-2, 1])
+ylim([4, 5])
+ end
 %% noisy case
 
 % noise
@@ -238,6 +270,8 @@ DD = datan*datan' / size(data, 2);
 
 % CLEAN-SC
 [Xcsc, q_CSC] = clean_sc_dr(DD,nbSources,XX, Pmic, k, 1);
+
+[Xhrcsc, q_HRCSC] = hr_clean_sc_dr(DD,nbSources,XX, Pmic, k, 1, 0.25);
 
 % DE
 if DE
@@ -277,57 +311,88 @@ save exp2
 load exp2
 load Xgt
 
-figure
-subplot(2, 2, 1)
+figure('Position', [100, 100, 1200, 500])
+
+subplot(2, 3, 1)
 scatter(Xgt(:, 1), Xgt(:, 2), 100, 'o', 'filled', 'MarkerFaceColor', [0.8 0.8 0.8])
 hold on
 scatter(XSP2(:, 1),XSP2(:, 2), amps_SP2/1e3+eps,C(3, :), '+', 'linewidth', 3)
-scatter(XM(:, 1),XM(:, 2),Pmest/1e3+eps, C(4, :),'x', 'linewidth', 3)
+scatter(XM(:, 1),XM(:, 2),Pmest/1e3+eps, C(7, :),'x', 'linewidth', 3)
 legend('Sources', 'COMET2', 'MUSIC')
-xlabel('X')
-ylabel('Y')
+xlabel('X (m)')
+ylabel('Y (m)')
 axis image
 xlim([-2, 1])
 ylim([-1, 0])
 
-subplot(2, 2, 3)
+subplot(2, 3, 4)
 scatter(Xgt(:, 1), Xgt(:, 3), 100, 'o', 'filled', 'MarkerFaceColor', [0.8 0.8 0.8])
 hold on
 scatter(XSP2(:, 1),XSP2(:, 3), amps_SP2/1e3+eps,C(3, :), '+', 'linewidth', 3)
-scatter(XM(:, 1),XM(:, 3),Pmest/1e3+eps, C(4, :),'x', 'linewidth', 3)
-xlabel('X')
-ylabel('Z')
+scatter(XM(:, 1),XM(:, 3),Pmest/1e3+eps, C(7, :),'x', 'linewidth', 3)
+xlabel('X (m)')
+ylabel('Z (m)')
 axis image
 xlim([-2, 1])
 ylim([4, 5])
 
-subplot(2, 2, 2)
+subplot(2, 3, 2)
 scatter(Xgt(:, 1), Xgt(:, 2), 100, 'o', 'filled', 'MarkerFaceColor', [0.8 0.8 0.8])
 hold on
-scatter(Xcsc(:, 1),Xcsc(:, 2),max(q_CSC,0)/1e3+eps, C(7, :), '+', 'linewidth', 3)
-if DE
-    scatter(depos(1, :),depos(2, :),depow/1e3+eps, C(1, :), 'x', 'linewidth', 3)
-    legend('Sources', 'CLEAN-SC', 'DE')    
-else
-    legend('Sources', 'CLEAN-SC')
-end
+scatter(Xcsc(:, 1),Xcsc(:, 2),max(q_CSC,0)/1e3+eps, C(2, :), '+', 'linewidth', 3)
+scatter(Xhrcsc(:, 1),Xhrcsc(:, 2),max(q_HRCSC, 0)/1e3+eps, C(6, :), 'x', 'linewidth', 3)
 
-xlabel('X')
-ylabel('Y')
+
+    legend('Sources', 'CLEAN-SC', 'HR-CLEAN-SC')
+
+
+xlabel('X (m)')
+ylabel('Y (m)')
 axis image
 xlim([-2, 1])
 ylim([-1, 0])
 
-subplot(2, 2, 4)
+subplot(2, 3, 5)
 scatter(Xgt(:, 1), Xgt(:, 3), 100, 'o', 'filled', 'MarkerFaceColor', [0.8 0.8 0.8])
 hold on
-scatter(Xcsc(:, 1),Xcsc(:, 3),max(q_CSC,0)/1e3+eps,C(7, :),  '+', 'linewidth', 3)
-if DE
-    scatter(depos(1, :),depos(3, :),depow/1e3+eps, C(1, :), 'x', 'linewidth', 3)
-end
+scatter(Xcsc(:, 1),Xcsc(:, 3),max(q_CSC,0)/1e3+eps,C(2, :),  '+', 'linewidth', 3)
+scatter(Xhrcsc(:, 1),Xhrcsc(:, 3),max(q_HRCSC, 0)/1e3+eps, C(6, :), 'x', 'linewidth', 3)
 
-xlabel('X')
-ylabel('Z')
+
+
+xlabel('X (m)')
+ylabel('Z (m)')
 axis image
 xlim([-2, 1])
 ylim([4, 5])
+
+if DE
+    
+subplot(2, 3, 3)
+scatter(Xgt(:, 1), Xgt(:, 2), 100, 'o', 'filled', 'MarkerFaceColor', [0.8 0.8 0.8])
+hold on
+
+    scatter(depos(1, :),depos(2, :),depow/1e3+eps, C(5, :), 's', 'linewidth', 3)
+    legend('Sources', 'DE')    
+
+
+xlabel('X (m)')
+ylabel('Y (m)')
+axis image
+xlim([-2, 1])
+ylim([-1, 0])
+
+subplot(2, 3, 6)
+scatter(Xgt(:, 1), Xgt(:, 3), 100, 'o', 'filled', 'MarkerFaceColor', [0.8 0.8 0.8])
+hold on
+
+    scatter(depos(1, :),depos(3, :),depow/1e3+eps, C(5, :), 's', 'linewidth', 3)
+
+
+xlabel('X (m)')
+ylabel('Z (m)')
+axis image
+xlim([-2, 1])
+ylim([4, 5])
+
+end

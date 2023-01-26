@@ -37,12 +37,16 @@ for u = 1:length(idx)
     % local optimization
     xopt = fmincon(@(x) obj(x, Pmic, k, V), XX(idx(u), :), [], [], [],[],[],[]);
     zzz = 0;
-
-      % remove is close to a previous source
+    
+      % remove is close to a previous source or negative Z coordinate
     for v = 1:size(Xest, 1)
-        if norm(xopt - Xest(v, :)) < tol
+        if (norm(xopt - Xest(v, :)) < tol)
             zzz = 1;
         end
+    end
+    
+    if xopt(3) < 0
+        zzz = 1;
     end
 
     if zzz == 0
@@ -51,6 +55,7 @@ for u = 1:length(idx)
 
 end
 end
+
 
 
 % keep the K highest values of the pseudospectrum

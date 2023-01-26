@@ -8,7 +8,7 @@ close all
 nbSources=2;
 
 % tested coordinate
-coord = 'X';
+coord = 'Z';
 
 if coord == 'Z'
     % frequency
@@ -25,12 +25,13 @@ else
     
     idxc = 1;
     DELTAS = linspace(0.01, 0.2, 200);
+
 end
 
 snr = -10;
 
 snapshots = 500;
-nbMethods = 7;
+nbMethods = 8;
 
 
 nbPlots = length(DELTAS);
@@ -172,12 +173,19 @@ for ii = 1:nbPlots
         
         
         % CLEAN-SC
-        [Xest, P, H] = clean_sc_dr(DD,nbSources,XX, Pmic, k, 1);
-        SOURCES_POS_EST{ii, s, 7} = Xest;
-        SOURCES_AMPS_EST{ii, s, 7} = P;
-        
-        SS{7} = [SS{7} ; Xest(:, idxc) delta*ones(size(Xest, 1), 1) P'];
-        
+         [Xest, P, H] = clean_sc_dr(DD,nbSources,XX, Pmic, k, 1);
+         SOURCES_POS_EST{ii, s, 7} = Xest;
+         SOURCES_AMPS_EST{ii, s, 7} = P;   
+         
+                 SS{7} = [SS{7} ; Xest(:, idxc) delta*ones(size(Xest, 1), 1) P'];
+                 
+        % HR-CLEAN-SC
+         [Xest, P, H] = hr_clean_sc_dr(DD,nbSources,XX, Pmic, k, 1, 0);
+         SOURCES_POS_EST{ii, s, 8} = Xest;
+         SOURCES_AMPS_EST{ii, s, 8} = P;   
+         
+         SS{8} = [SS{8} ; Xest(:, idxc) delta*ones(size(Xest, 1), 1) P'];
+
     end
 end
 
@@ -192,21 +200,63 @@ else
 end
 C = colororder();
 
-scatter(SS{3}(:, 2)*2, SS{3}(:, 1), SS{3}(:, 3)*50+eps, C(3, :), 'o')
+figure('Position', [100, 100, 800, 600])
+
+
+LW = 2;
+
+subplot(1, 2, 1)
+
+scatter(SS{3}(:, 2)*2, SS{3}(:, 1), SS{3}(:, 3)*50+eps, C(3, :), '+', 'linewidth', LW)
 hold on
 
-scatter(SS{4}(:, 2)*2, SS{4}(:, 1), SS{4}(:, 3)*50+eps, C(4, :), 's')
-scatter(SS{5}(:, 2)*2, SS{5}(:, 1), SS{5}(:, 3)*50+eps, C(5, :), '^')
-scatter(SS{7}(:, 2)*2, SS{7}(:, 1), max(SS{7}(:, 3),0)*100+eps, C(7, :), '+')
+scatter(SS{4}(:, 2)*2, SS{4}(:, 1), SS{4}(:, 3)*50+eps, C(7, :), 'x', 'linewidth', LW)
+scatter(SS{5}(:, 2)*2, SS{5}(:, 1), SS{5}(:, 3)*50+eps, C(4, :), 's', 'linewidth', LW)
 
 
-legend('COMET2', 'MUSIC', 'OBF', 'CLEAN-SC')
-
-xlabel('\delta')
-if coord == 'X'
-    ylabel('Estimated X coordinate')
+if coord == 'Z'
+plot(SS{4}(:, 2)*2, 4+SS{4}(:, 2), '--k', 'linewidth', 2)
+plot(SS{4}(:, 2)*2, 4-SS{4}(:, 2), '--k', 'linewidth', 2)
 else
-    ylabel('Estimated Z coordinate')
+plot(SS{4}(:, 2)*2, SS{4}(:, 2), '--k', 'linewidth', 2)
+plot(SS{4}(:, 2)*2, -SS{4}(:, 2), '--k', 'linewidth', 2)
+end
+
+legend('COMET2', 'MUSIC', 'OBF')
+xlabel('\delta  (m)')
+if coord == 'X'
+    ylabel('Estimated X coordinate (m)')
+    ylim([-0.25, 0.25]);
+else
+    ylabel('Estimated Z coordinate (m)')
+            ylim([3.7, 4.3]);
+
 end
 
 
+
+subplot(1, 2, 2)
+
+scatter(SS{8}(:, 2)*2, SS{8}(:, 1), max(SS{8}(:, 3),0)*100+eps, C(6, :), '^', 'linewidth', LW)
+hold on
+scatter(SS{7}(:, 2)*2, SS{7}(:, 1), max(SS{7}(:, 3),0)*100+eps, C(2, :), 'o', 'linewidth', LW)
+
+
+if coord == 'Z'
+plot(SS{4}(:, 2)*2, 4+SS{4}(:, 2), '--k', 'linewidth', 2)
+plot(SS{4}(:, 2)*2, 4-SS{4}(:, 2), '--k', 'linewidth', 2)
+else
+plot(SS{4}(:, 2)*2, SS{4}(:, 2), '--k', 'linewidth', 2)
+plot(SS{4}(:, 2)*2, -SS{4}(:, 2), '--k', 'linewidth', 2)
+end
+legend('HRCSC', 'CLEAN-SC')
+
+xlabel('\delta  (m)')
+if coord == 'X'
+    ylabel('Estimated X coordinate (m)')
+    ylim([-0.25, 0.25]);
+else
+    ylabel('Estimated Z coordinate (m)')
+        ylim([3.7, 4.3]);
+
+end
