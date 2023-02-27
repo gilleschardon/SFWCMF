@@ -3,6 +3,8 @@ Code for source localization with the covariance matrix fitting methods and Slid
 
 Code and data to reproduce the results of *Gridless covariance matrix fitting methods for three dimensional acoustical source localization*
 
+This code is not maintained. See [acosolo](https://github.com/gilleschardon/acosolo) for python and matlab implementations.
+
 ## Figures
 
 The proposed methods (CMF and COMET with Sliding Frank-Wolfe) are compared with MUSIC, CLEAN-SC, HR-CLEAN-SC, OMP, and differential evolution (see references in the paper)
